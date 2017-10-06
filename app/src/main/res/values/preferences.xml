@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Movies list sorting order preferences -->
+    <string-array name="movies_preferences_sortby_options">
+        <item>@string/movies_sortby_popularity</item>
+        <item>@string/movies_sortby_rating</item>
+    </string-array>
+    <integer name="movies_sortby_options_default">0</integer>
+</resources>
