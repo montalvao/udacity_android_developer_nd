@@ -30,9 +30,9 @@ public class TMDBHelper {
         return buildAPIQueryURL(API_MOVIE_LIST_BY_RATING);
     }
 
-    public static URL getPosterURL(String filename) {
+    public static Uri getPosterUri(String filename) {
         //TODO: Optimize for device screen
-        return buildPosterURL("w185", filename);
+        return buildPosterUri("w185", filename);
     }
 
     private static URL buildAPIQueryURL(String order) {
@@ -56,23 +56,17 @@ public class TMDBHelper {
        return result;
     }
 
-    private static URL buildPosterURL(String size, String fileName) {
-        final Uri baseUri = Uri.parse(IMAGE_URI_BASE);
-
-        Uri.Builder builder = baseUri.buildUpon();
-
-        Uri uri = builder.appendPath(size)
-                .appendPath(fileName)
-                .build();
-
-        URL result = null;
-        try {
-            result = new URL(uri.toString());
-            Log.i(TMDBHelper.class.getSimpleName(),"buildPosterURL: result = " + result.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+    private static Uri buildPosterUri(String size, String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return null;
         }
 
-        return result;
+        final Uri baseUri = Uri.parse(IMAGE_URI_BASE);
+
+        Uri.Builder builder = baseUri.buildUpon()
+                .appendPath(size)
+                .appendPath(fileName);
+
+        return builder.build();
     }
 }

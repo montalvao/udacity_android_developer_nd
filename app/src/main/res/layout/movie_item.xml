@@ -8,8 +8,16 @@
         android:layout_height="match_parent"
         android:visibility="invisible" />
 
+    <TextView
+        android:id="@+id/textview_movie_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:textSize="24sp" />
+
     <ImageView
-        android:id="@+id/imageview_movie_item"
+        android:id="@+id/imageview_movie_item_poster"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/movie_cover" />

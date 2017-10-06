@@ -12,7 +12,8 @@ import android.view.MenuItem;
 
 import com.example.android.popmovies.data.PopMoviesPreferences;
 
-public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
+        MoviesAdapter.MoviesAdapterOnClickListener {
     //TODO: Use the Android Design support library if needed (https://android-developers.googleblog.com/2015/05/android-design-support-library.html)
     private RecyclerView mRecyclerViewMovies;
     private MoviesAdapter mAdapter;
@@ -23,6 +24,13 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         setContentView(R.layout.activity_movies);
 
         mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
+
+        mAdapter = new MoviesAdapter(this);
+
+        mRecyclerViewMovies.setAdapter(mAdapter);
+
+
+        loadData();
     }
 
     @Override
@@ -79,5 +87,10 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         } else {
             throw new RuntimeException();
         }
+    }
+
+    @Override
+    public void onClick(int id) {
+
     }
 }
