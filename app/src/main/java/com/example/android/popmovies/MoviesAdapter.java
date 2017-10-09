@@ -1,12 +1,16 @@
 package com.example.android.popmovies;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +48,8 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         private final ProgressBar mProgressBar;
         private final TextView mTitleView;
         private final ImageView mPosterView;
+        private final int thumbnailWidth;
+        private final int thumbnailHeight;
 
         MoviesAdapterViewHolder(View view) {
             super(view);
@@ -53,6 +59,20 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             mTitleView = (TextView) view.findViewById(R.id.textview_movie_item);
             mPosterView = (ImageView) view.findViewById(R.id.imageview_movie_item_poster);
 
+            //TODO: Remove this code from here!!!
+            Configuration configuration = mContext.getResources().getConfiguration();
+            Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            DisplayMetrics metrics = new DisplayMetrics();
+            display.getMetrics(metrics);
+            int columns;
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                columns = 2;
+            } else {
+                columns = 4;
+            }
+            thumbnailWidth = metrics.widthPixels / columns;
+            thumbnailHeight = (int) (thumbnailWidth * 1.5);
+
             view.setOnClickListener(this);
         }
 
@@ -61,7 +81,9 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             mProgressBar.setVisibility(View.INVISIBLE);
 
             mPosterView.setContentDescription(title);
-            Picasso.with(mContext).load(posterUri).fit().into(mPosterView, this);
+            Picasso.with(mContext).load(posterUri)
+                    .resize(thumbnailWidth, thumbnailHeight)
+                    .into(mPosterView, this);
 
             mPosterView.setVisibility(View.VISIBLE);
         }

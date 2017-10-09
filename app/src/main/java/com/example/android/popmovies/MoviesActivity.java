@@ -86,7 +86,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         if (orientation == Configuration.ORIENTATION_PORTRAIT)
             return 2;
         else
-            return 3;
+            return 4;
     }
 
     @Override
