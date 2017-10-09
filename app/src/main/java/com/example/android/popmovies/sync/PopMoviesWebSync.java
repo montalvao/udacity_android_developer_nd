@@ -1,9 +1,13 @@
 package com.example.android.popmovies.sync;
 
+import android.support.annotation.IntDef;
+
 import com.example.android.popmovies.data.Movie;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.URL;
 
 import okhttp3.OkHttpClient;
@@ -17,6 +21,9 @@ import okhttp3.ResponseBody;
 
 public class PopMoviesWebSync implements PopMoviesSync {
 
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({SORT_BY_POPULARITY, SORT_BY_RATING})
+    @interface SortingKey {}
     public static final int SORT_BY_POPULARITY = 0;
     public static final int SORT_BY_RATING = 1;
 
@@ -77,7 +84,7 @@ public class PopMoviesWebSync implements PopMoviesSync {
             mWebSyncInstance.mRequestedId = id;
         }
 
-        public void sortResultsBy(int sortBy) {
+        public void sortResultsBy(@SortingKey int sortBy) {
             mWebSyncInstance.mSortBy = sortBy;
         }
 

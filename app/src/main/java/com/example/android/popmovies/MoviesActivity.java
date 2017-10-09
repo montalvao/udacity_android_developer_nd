@@ -4,25 +4,32 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.data.PopMoviesPreferences;
 import com.example.android.popmovies.sync.PopMoviesSync;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
-import com.example.android.popmovies.sync.TMDBHelper;
 
 import java.io.IOException;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener {
+
     //TODO: Use the Android Design support library if needed (https://android-developers.googleblog.com/2015/05/android-design-support-library.html)
     private RecyclerView mRecyclerViewMovies;
+    private TextView mErrorTextView;
+    private ProgressBar mLoadingIndicator;
+
     private MoviesAdapter mAdapter;
 
     @Override
@@ -31,10 +38,20 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         setContentView(R.layout.activity_movies);
 
         mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.progressbar_movies);
+        mErrorTextView = (TextView) findViewById(R.id.textview_error_panel);
 
         mAdapter = new MoviesAdapter(this);
 
         mRecyclerViewMovies.setAdapter(mAdapter);
+
+        mErrorTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.setData(null);
+                loadData();
+            }
+        });
 
         loadData();
     }
@@ -82,7 +99,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     private void loadData() {
         if (!PopMoviesApp.getApp().isNetworkConnected()) {
-            //TODO: No network contidion handling.
+            showNoNetworkErrorView();
             return;
         }
 
@@ -112,6 +129,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            showLoadingView();
         }
 
         @Override
@@ -131,22 +149,56 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
         @Override
         protected void onCancelled() {
-            //TODO handle communication errors.
             super.onCancelled();
+            showSyncErrorView();
         }
 
         @Override
         protected void onPostExecute(Movie[] data) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (data != null && data.length > 0) {
                 super.onPostExecute(data);
-
+                showMoviesView();
+                mAdapter.setData(data);
+            } else {
+                showSyncErrorView();
             }
-            //TODO handle unavailable data
         }
+
+    }
+
+    private void showNoNetworkErrorView() {
+        showErrorView(R.string.error_panel_nonetwork);
+    }
+
+    private void showSyncErrorView() {
+        showErrorView(R.string.error_panel_sync);
+    }
+
+    private void showErrorView(@StringRes int errorString) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mRecyclerViewMovies.setVisibility(View.INVISIBLE);
+
+        mErrorTextView.setText(errorString);
+        mErrorTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoadingView() {
+        mErrorTextView.setVisibility(View.INVISIBLE);
+        mRecyclerViewMovies.setVisibility(View.INVISIBLE);
+
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void showMoviesView() {
+        mErrorTextView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+
+        mRecyclerViewMovies.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onClick(int id) {
-
+    public void onClick(Movie movie) {
+        //TODO: Implement intent to show movie details.
     }
 }

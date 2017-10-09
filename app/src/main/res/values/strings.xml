@@ -4,4 +4,6 @@
     <string name="movies_sortby_popularity">Popularity</string>
     <string name="movies_sortby_rating">Rating</string>
     <string name="movie_cover">Movie Cover</string>
+    <string name="error_panel_nonetwork">No network.\\nTap to retry.</string>
+    <string name="error_panel_sync">Sync error.\\nTap to retry.</string>
 </resources>
