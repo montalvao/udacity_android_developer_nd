@@ -1,11 +1,8 @@
 package com.example.android.popmovies;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +13,11 @@ import android.view.MenuItem;
 
 import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.data.PopMoviesPreferences;
+import com.example.android.popmovies.sync.PopMoviesSync;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
 import com.example.android.popmovies.sync.TMDBHelper;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener {
@@ -84,39 +81,33 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     }
 
     private void loadData() {
-        if (!isNetworkConnected()) {
+        if (!PopMoviesApp.getApp().isNetworkConnected()) {
             //TODO: No network contidion handling.
             return;
         }
 
-        FetchWebDataTask fetchWebDataTask = new FetchWebDataTask();
+        FetchDataTask fetchDataTask = new FetchDataTask();
         PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(getApplication());
-
         String sortOrder = preferences.getSortOrder();
         Resources resources = getResources();
-        URL url;
 
+        //------ Load from TMDB --------------------------------------------------
+        PopMoviesWebSync.Builder builder = new PopMoviesWebSync.Builder();
         if (sortOrder.equals(resources.getString(R.string.movies_sortby_popularity))) {
-            url = TMDBHelper.getListedByPopularityURL();
+            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_POPULARITY);
         } else if (sortOrder.equals(resources.getString(R.string.movies_sortby_rating))) {
-            url = TMDBHelper.getListedByRatingURL();
+            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_RATING);
         } else {
             throw new RuntimeException();
         }
 
-        fetchWebDataTask.execute(url);
+        PopMoviesSync syncEngine = builder.build();
+        //------------------------------------------------------------------------
+
+        fetchDataTask.execute(syncEngine);
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo network = connectivityManager.getActiveNetworkInfo();
-
-        return ( network != null && network.isConnected() );
-    }
-
-    private class FetchWebDataTask extends AsyncTask<URL, Void, Movie[]> {
+    private class FetchDataTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
 
         @Override
         protected void onPreExecute() {
@@ -124,13 +115,13 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         }
 
         @Override
-        protected Movie[] doInBackground(URL... urls) {
-            URL url = urls[0];
+        protected Movie[] doInBackground(PopMoviesSync... syncEngines) {
+            PopMoviesSync syncEngine = syncEngines[0];
 
             Movie[] result = null;
 
             try {
-                result = PopMoviesWebSync.getMoviesList(url);
+                result = syncEngine.query();
             } catch (IOException e) {
                 cancel(true);
             }
@@ -148,6 +139,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         protected void onPostExecute(Movie[] data) {
             if (data != null && data.length > 0) {
                 super.onPostExecute(data);
+
             }
             //TODO handle unavailable data
         }

@@ -15,13 +15,34 @@ import okhttp3.ResponseBody;
  * Created by rodrigo.montalvao on 06/10/2017.
  */
 
-public class PopMoviesWebSync {
+public class PopMoviesWebSync implements PopMoviesSync {
 
-    public static Movie[] getMoviesList(URL url) throws IOException {
+    public static final int SORT_BY_POPULARITY = 0;
+    public static final int SORT_BY_RATING = 1;
+
+    private int mSortBy = SORT_BY_POPULARITY;
+    private int mRequestedId = -1;
+
+    private PopMoviesWebSync() {}
+
+    @Override
+    public Movie[] query() throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request.Builder requestBuilder = new Request.Builder();
 
-        Request request = requestBuilder.url(url).build();
+        URL requestURL;
+        switch (mSortBy) {
+            case SORT_BY_POPULARITY:
+                requestURL = TMDBHelper.getListedByPopularityURL();
+                break;
+            case SORT_BY_RATING:
+                requestURL = TMDBHelper.getListedByRatingURL();
+                break;
+            default:
+                throw new RuntimeException();
+        }
+
+        Request request = requestBuilder.url(requestURL).build();
 
         Response response = client.newCall(request).execute();
 
@@ -42,5 +63,26 @@ public class PopMoviesWebSync {
         Gson gson = new Gson();
 
         return gson.fromJson(jsonString, Movie[].class);
+    }
+
+    public static class Builder {
+
+        private PopMoviesWebSync mWebSyncInstance;
+
+        public Builder() {
+            mWebSyncInstance = new PopMoviesWebSync();
+        }
+
+        public void withId(int id) {
+            mWebSyncInstance.mRequestedId = id;
+        }
+
+        public void sortResultsBy(int sortBy) {
+            mWebSyncInstance.mSortBy = sortBy;
+        }
+
+        public PopMoviesWebSync build() {
+            return mWebSyncInstance;
+        }
     }
 }
