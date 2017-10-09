@@ -1,14 +1,20 @@
 package com.example.android.popmovies;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,24 +28,42 @@ import com.example.android.popmovies.sync.PopMoviesWebSync;
 
 import java.io.IOException;
 
+import javax.microedition.khronos.opengles.GL;
+
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener {
 
-    //TODO: Use the Android Design support library if needed (https://android-developers.googleblog.com/2015/05/android-design-support-library.html)
+    private static final String TAG = MoviesActivity.class.getSimpleName();
+
     private RecyclerView mRecyclerViewMovies;
-    private TextView mErrorTextView;
     private ProgressBar mLoadingIndicator;
+    private TextView mErrorTextView;
 
     private MoviesAdapter mAdapter;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 
-        mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.progressbar_movies);
         mErrorTextView = (TextView) findViewById(R.id.textview_error_panel);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.progressbar_movies);
+        mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
+
+        GridLayoutManager layoutManager = new GridLayoutManager(this, determineSpanCount());
+        mRecyclerViewMovies.setLayoutManager(layoutManager);
+
+        mRecyclerViewMovies.setHasFixedSize(true);
 
         mAdapter = new MoviesAdapter(this);
 
@@ -54,6 +78,15 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         });
 
         loadData();
+    }
+
+    private int determineSpanCount() {
+        int orientation = getResources().getConfiguration().orientation;
+
+        if (orientation == Configuration.ORIENTATION_PORTRAIT)
+            return 2;
+        else
+            return 3;
     }
 
     @Override
@@ -97,13 +130,14 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         }
     }
 
+
     private void loadData() {
-        if (!PopMoviesApp.getApp().isNetworkConnected()) {
+        if (!isNetworkConnected()) {
             showNoNetworkErrorView();
             return;
         }
 
-        FetchDataTask fetchDataTask = new FetchDataTask();
+        dataSyncTask dataSyncTask = new dataSyncTask();
         PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(getApplication());
         String sortOrder = preferences.getSortOrder();
         Resources resources = getResources();
@@ -121,10 +155,19 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         PopMoviesSync syncEngine = builder.build();
         //------------------------------------------------------------------------
 
-        fetchDataTask.execute(syncEngine);
+        dataSyncTask.execute(syncEngine);
     }
 
-    private class FetchDataTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
+    private boolean isNetworkConnected() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo network = connectivityManager.getActiveNetworkInfo();
+
+        return ( network != null && network.isConnected() );
+    }
+
+    private class dataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
 
         @Override
         protected void onPreExecute() {
@@ -156,10 +199,10 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         @Override
         protected void onPostExecute(Movie[] data) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
+            Log.d(TAG, "[onPostExecute] data.length = " + data.length);
             if (data != null && data.length > 0) {
-                super.onPostExecute(data);
-                showMoviesView();
                 mAdapter.setData(data);
+                showMoviesView();
             } else {
                 showSyncErrorView();
             }
@@ -175,11 +218,11 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         showErrorView(R.string.error_panel_sync);
     }
 
-    private void showErrorView(@StringRes int errorString) {
+    private void showErrorView(@StringRes int errorStringRes) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerViewMovies.setVisibility(View.INVISIBLE);
 
-        mErrorTextView.setText(errorString);
+        mErrorTextView.setText(errorStringRes);
         mErrorTextView.setVisibility(View.VISIBLE);
     }
 

@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popmovies.BuildConfig;
+import com.example.android.popmovies.data.Movie;
+import com.google.gson.annotations.SerializedName;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +15,9 @@ import java.net.URL;
  */
 
 public class TMDBHelper {
+
+    private static final String TAG = TMDBHelper.class.getSimpleName();
+
     private static final String API_URI_BASE = "https://api.themoviedb.org/3";
     private static final String API_MOVIE_PATH = "movie";
     private static final String API_MOVIE_LIST_BY_POPULARITY = "popular";
@@ -48,7 +53,7 @@ public class TMDBHelper {
         URL result = null;
         try {
             result = new URL(uri.toString());
-            Log.i(TMDBHelper.class.getSimpleName(),"buildAPIQueryURL: result = " + result.toString());
+            Log.i(TAG,"buildAPIQueryURL: result = " + result.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -57,16 +62,31 @@ public class TMDBHelper {
     }
 
     private static Uri buildPosterUri(String size, String fileName) {
-        if (fileName == null || fileName.isEmpty()) {
+        if (fileName == null || fileName.isEmpty())
             return null;
-        }
 
         final Uri baseUri = Uri.parse(IMAGE_URI_BASE);
 
         Uri.Builder builder = baseUri.buildUpon()
                 .appendPath(size)
-                .appendPath(fileName);
+                .appendEncodedPath(fileName);
 
-        return builder.build();
+        Uri result = builder.build();
+
+        Log.i(TAG,"buildPosterUri: result = " + result.toString());
+
+        return result;
+    }
+
+    public static class APIResponseJSON {
+        @SerializedName("results") private final Movie[] mResults;
+
+        public APIResponseJSON(Movie[] results) {
+            mResults = results;
+        }
+
+        public Movie[] getResults() {
+            return mResults;
+        }
     }
 }

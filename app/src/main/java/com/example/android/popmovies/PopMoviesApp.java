@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.example.android.popmovies.data.PopMoviesPreferences;
+
 /**
  * Created by rodrigo.montalvao on 09/10/2017.
  */

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="wrap_content">
 
     <ProgressBar
         android:id="@+id/progressbar_movie_item"
@@ -14,11 +14,12 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="invisible"
-        android:textSize="24sp" />
+        android:textSize="16sp"
+        android:padding="16dp"/>
 
     <ImageView
         android:id="@+id/imageview_movie_item_poster"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="180dp"
+        android:layout_height="270dp"
         android:contentDescription="@string/movie_cover" />
 </FrameLayout>

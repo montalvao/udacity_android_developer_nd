@@ -3,6 +3,7 @@ package com.example.android.popmovies;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.sync.TMDBHelper;
 import com.example.android.popmovies.utilities.PopMoviesUtilities;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -20,6 +22,10 @@ import com.squareup.picasso.Picasso;
  */
 
 class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
+
+    private static final String TAG = MoviesAdapter.class.getSimpleName();
+
+    public static final String MOVIES_DATA = MoviesAdapter.class.getName() + ".MOVIES_DATA";
 
     private Movie[] mMoviesData;
 
@@ -33,7 +39,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         mOnClickListener = listener;
     }
 
-    class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Callback {
         private final Context mContext;
         private final ProgressBar mProgressBar;
         private final TextView mTitleView;
@@ -50,18 +56,12 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             view.setOnClickListener(this);
         }
 
-        @Override
-        public void onClick(View v) {
-            int index = getAdapterPosition();
-            mOnClickListener.onClick(mMoviesData[index]);
-        }
-
         void showPoster(Uri posterUri, String title) {
             mTitleView.setVisibility(View.INVISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
 
             mPosterView.setContentDescription(title);
-            Picasso.with(mContext).load(posterUri).into(mPosterView);
+            Picasso.with(mContext).load(posterUri).fit().into(mPosterView, this);
 
             mPosterView.setVisibility(View.VISIBLE);
         }
@@ -79,6 +79,25 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             mPosterView.setVisibility(View.INVISIBLE);
 
             mProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int index = getAdapterPosition();
+            mOnClickListener.onClick(mMoviesData[index]);
+        }
+
+        @Override
+        public void onSuccess() {}
+
+        @Override
+        public void onError() {
+            String title = mPosterView.getContentDescription().toString();
+            if (!title.isEmpty()) {
+                showTitle(title);
+            } else {
+                showLoading();
+            }
         }
     }
 
@@ -111,6 +130,9 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     @Override
     public int getItemCount() {
+        if (mMoviesData == null)
+            return 0;
+
         return mMoviesData.length;
     }
 

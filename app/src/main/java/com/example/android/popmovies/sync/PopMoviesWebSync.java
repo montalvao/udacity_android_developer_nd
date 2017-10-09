@@ -69,7 +69,9 @@ public class PopMoviesWebSync implements PopMoviesSync {
     private static Movie[] moviesArrayFromJSON(String jsonString) {
         Gson gson = new Gson();
 
-        return gson.fromJson(jsonString, Movie[].class);
+        TMDBHelper.APIResponseJSON result = gson.fromJson(jsonString, TMDBHelper.APIResponseJSON.class);
+
+        return result.getResults();
     }
 
     public static class Builder {
@@ -92,4 +94,6 @@ public class PopMoviesWebSync implements PopMoviesSync {
             return mWebSyncInstance;
         }
     }
+
+
 }
