@@ -1,5 +1,6 @@
 package com.example.android.popmovies;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popmovies.data.Movie;
+import com.example.android.popmovies.data.PopMoviesPreferences;
 import com.example.android.popmovies.sync.TMDBHelper;
 import com.example.android.popmovies.utilities.PopMoviesUtilities;
 import com.squareup.picasso.Callback;
@@ -59,19 +61,11 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             mTitleView = (TextView) view.findViewById(R.id.textview_movie_item);
             mPosterView = (ImageView) view.findViewById(R.id.imageview_movie_item_poster);
 
-            //TODO: Remove this code from here!!!
-            Configuration configuration = mContext.getResources().getConfiguration();
-            Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            DisplayMetrics metrics = new DisplayMetrics();
-            display.getMetrics(metrics);
-            int columns;
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                columns = 2;
-            } else {
-                columns = 4;
-            }
-            thumbnailWidth = metrics.widthPixels / columns;
-            thumbnailHeight = (int) (thumbnailWidth * 1.5);
+            PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(
+                    (Application) mContext.getApplicationContext());
+
+            thumbnailWidth = preferences.getThumbnailWidth();
+            thumbnailHeight = preferences.getThumbnailHeight();
 
             view.setOnClickListener(this);
         }

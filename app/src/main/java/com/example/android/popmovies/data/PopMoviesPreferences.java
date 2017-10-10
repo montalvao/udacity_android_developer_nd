@@ -3,7 +3,9 @@ package com.example.android.popmovies.data;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.example.android.popmovies.R;
 
@@ -15,30 +17,38 @@ public class PopMoviesPreferences {
 
     private static final String PREFERENCES_NAME = PopMoviesPreferences.class.getName();
 
-    public static final String PREFERENCE_SORT_ORDER = PREFERENCES_NAME + ".SortOrder";
+    private static PopMoviesPreferences mInstance = null;
 
-    private final Resources mResources;
-    private final SharedPreferences mPreferences;
-
-    private PopMoviesPreferences mInstance;
+    private Context mContext;
+    private SharedPreferences mPreferences;
 
     private PopMoviesPreferences(Application app) {
-        mResources = app.getResources();
+        mContext = app.getApplicationContext();
         mPreferences = app.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 
     public static PopMoviesPreferences getPreferences(Application app) {
-        return new PopMoviesPreferences(app);
+        if (mInstance == null)
+            mInstance = new PopMoviesPreferences(app);
+
+        return mInstance;
     }
 
     public String[] getSortOrderOptions() {
-        return mResources.getStringArray(R.array.movies_preferences_sortby_options);
+        return mContext.getResources().getStringArray(R.array.pref_movies_sortby_options);
     }
 
     public int getSortOrderIndex() {
-        final int prefDefault = mResources.getInteger(R.integer.movies_sortby_options_default);
+        String pref = mContext.getResources().getString(R.string.pref_sort_order);
 
-        return mPreferences.getInt(PREFERENCE_SORT_ORDER, prefDefault);
+        if (mPreferences.contains(pref))
+            return mPreferences.getInt(pref, -1);
+
+        int result = mContext.getResources().getInteger(R.integer.movies_sortby_options_default);
+
+        savePreference(pref, result);
+
+        return result;
     }
 
     public String getSortOrder() {
@@ -48,10 +58,57 @@ public class PopMoviesPreferences {
         return options[index];
     }
 
-    public void setSortOrder(int index) {
+    public void setSortOrder(int value) {
+        String pref = mContext.getResources().getString(R.string.pref_sort_order);
+        savePreference(pref, value);
+    }
+
+    public int getThumbnailWidth() {
+        String pref = mContext.getResources().getString(R.string.pref_thumbnail_width);
+        if (mPreferences.contains(pref))
+            return mPreferences.getInt(pref, -1);
+
+        Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))
+                .getDefaultDisplay();
+
+        DisplayMetrics metrics = new DisplayMetrics();
+
+        display.getMetrics(metrics);
+
+        int result = (metrics.widthPixels / getColumnSpan());
+
+        savePreference(pref, result);
+
+        return result;
+    }
+
+    public int getThumbnailHeight() {
+        String pref = mContext.getResources().getString(R.string.pref_thumbnail_height);
+        if (mPreferences.contains(pref))
+            return mPreferences.getInt(pref, -1);
+
+        int result = (int) (getThumbnailWidth() * 1.5);
+
+        savePreference(pref, result);
+
+        return result;
+    }
+
+    public int getColumnSpan() {
+        String pref = mContext.getResources().getString(R.string.pref_column_span);
+        if (mPreferences.contains(pref))
+            return mPreferences.getInt(pref, -1);
+
+        int result = mContext.getResources().getInteger(R.integer.column_span_default);
+
+        savePreference(pref, result);
+
+        return result;
+    }
+
+    private void savePreference(String pref, int value) {
         SharedPreferences.Editor editor = mPreferences.edit();
 
-        editor.putInt(PREFERENCE_SORT_ORDER, index)
-                .apply();
+        editor.putInt(pref, value).apply();
     }
 }

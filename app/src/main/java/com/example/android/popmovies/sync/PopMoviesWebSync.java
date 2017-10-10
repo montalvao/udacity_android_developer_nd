@@ -28,7 +28,6 @@ public class PopMoviesWebSync implements PopMoviesSync {
     public static final int SORT_BY_RATING = 1;
 
     private int mSortBy = SORT_BY_POPULARITY;
-    private int mRequestedId = -1;
 
     private PopMoviesWebSync() {}
 
@@ -82,10 +81,6 @@ public class PopMoviesWebSync implements PopMoviesSync {
             mWebSyncInstance = new PopMoviesWebSync();
         }
 
-        public void withId(int id) {
-            mWebSyncInstance.mRequestedId = id;
-        }
-
         public void sortResultsBy(@SortingKey int sortBy) {
             mWebSyncInstance.mSortBy = sortBy;
         }
@@ -94,6 +89,4 @@ public class PopMoviesWebSync implements PopMoviesSync {
             return mWebSyncInstance;
         }
     }
-
-
 }

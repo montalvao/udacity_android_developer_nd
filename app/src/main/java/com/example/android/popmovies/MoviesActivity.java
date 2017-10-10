@@ -28,8 +28,6 @@ import com.example.android.popmovies.sync.PopMoviesWebSync;
 
 import java.io.IOException;
 
-import javax.microedition.khronos.opengles.GL;
-
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener {
 
@@ -124,7 +122,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(PopMoviesPreferences.PREFERENCE_SORT_ORDER)) {
+        if (getResources().getString(R.string.pref_sort_order).equals(key)) {
             mAdapter.setData(null);
             loadData();
         }
@@ -199,8 +197,8 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         @Override
         protected void onPostExecute(Movie[] data) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
-            Log.d(TAG, "[onPostExecute] data.length = " + data.length);
             if (data != null && data.length > 0) {
+                Log.d(TAG, "[onPostExecute] data.length = " + data.length);
                 mAdapter.setData(data);
                 showMoviesView();
             } else {
