@@ -29,7 +29,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     public static final String MOVIES_DATA = MoviesAdapter.class.getName() + ".MOVIES_DATA";
 
-    private Movie[] mMoviesData;
+    private Movie[] mMoviesData = null;
 
     private MoviesAdapterOnClickListener mOnClickListener;
 

@@ -26,8 +26,6 @@ import com.example.android.popmovies.data.PopMoviesPreferences;
 import com.example.android.popmovies.sync.PopMoviesSync;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
 
-import org.parceler.Parcels;
-
 import java.io.IOException;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -47,14 +45,8 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Movie[] data = mAdapter.getData();
-        outState.putser
-                putParcelable(SAVED_STATE_DATA, Parcels.wrap(data));
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+        if (data != null && data.length > 0)
+            outState.putSerializable(SAVED_STATE_DATA, data);
     }
 
     @Override
@@ -85,11 +77,14 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
                 loadData();
             }
         });
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        if (savedInstanceState != null) {
+            Movie[] data = (Movie[]) savedInstanceState.getSerializable(SAVED_STATE_DATA);
+            if (data != null && data.length > 0) {
+                mAdapter.setData(data);
+                return;
+            }
+        }
 
         loadData();
     }

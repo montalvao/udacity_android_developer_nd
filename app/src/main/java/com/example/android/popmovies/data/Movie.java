@@ -2,13 +2,13 @@ package com.example.android.popmovies.data;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
+import java.io.Serializable;
 
 /**
  * Created by rodrigo.montalvao on 06/10/2017.
  */
 
-public class Movie {
+public class Movie implements Serializable {
     //TODO: See if Parceler library is applicable (https://github.com/johncarl81/parceler)
     @SerializedName("id")               public final int id;
     @SerializedName("title")            public final String title;
