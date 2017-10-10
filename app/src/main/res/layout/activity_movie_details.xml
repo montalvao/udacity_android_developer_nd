@@ -22,7 +22,6 @@
         android:id="@+id/textview_details_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Spiderman: Homecoming again and again"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -37,7 +36,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Spiderman: Homecoming again and again"
         android:textSize="18sp"
         android:textStyle="italic"
         android:layout_marginEnd="8dp"
@@ -52,7 +50,6 @@
         android:id="@+id/textview_details_user_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rating: 5.0"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/imageview_details_poster"
         android:layout_marginStart="8dp"
@@ -76,7 +73,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:text="Following the events of Captain America: Civil War, Peter Parker, with the help of his mentor Tony Stark, tries to balance his life as an ordinary high school student in Queens, New York City, with fighting crime as his superhero alter ego Spider-Man as a new threat, the Vulture, emerges."
             android:textSize="14sp" />
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

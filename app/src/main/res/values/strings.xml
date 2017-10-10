@@ -6,4 +6,5 @@
     <string name="movie_cover">Movie Cover</string>
     <string name="error_panel_nonetwork">No network!\n\nTap to retry</string>
     <string name="error_panel_sync">Sync error!\n\nTap to retry</string>
+    <string name="movie_details_rating">Rating: %s</string>
 </resources>

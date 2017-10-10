@@ -46,8 +46,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void showData() {
         mTitleTextView.setText(mMovie.title);
         mTitleOriginalTextView.setText(mMovie.titleOriginal);
-        mUserRatingTextView.setText(mMovie.userRating);
         mPlotSynopsisTextView.setText(mMovie.plotSynopsis);
+
+        String ratingString = getResources().getString(R.string.movie_details_rating, mMovie.userRating);
+        mUserRatingTextView.setText(ratingString);
 
         Uri posterUri = TMDBHelper.getPosterUri(mMovie.posterThumbFilename);
 
