@@ -51,7 +51,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Uri posterUri = TMDBHelper.getPosterUri(mMovie.posterThumbFilename);
 
         Picasso.with(getBaseContext()).load(posterUri)
-                .fit()
+                .centerCrop().fit()
                 .into(mPosterView);
     }
 }
