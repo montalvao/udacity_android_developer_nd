@@ -9,7 +9,9 @@ import java.io.Serializable;
  */
 
 public class Movie implements Serializable {
-    //TODO: See if Parceler library is applicable (https://github.com/johncarl81/parceler)
+
+    public static final String MOVIE_CONTENT = Movie.class.getSimpleName() + ".MOVIE_CONTENT";
+
     @SerializedName("id")               public final int id;
     @SerializedName("title")            public final String title;
     @SerializedName("original_title")   public final String titleOriginal;

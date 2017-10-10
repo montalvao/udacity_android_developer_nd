@@ -2,8 +2,8 @@ package com.example.android.popmovies;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -43,13 +43,6 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     private MoviesAdapter mAdapter;
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Movie[] data = mAdapter.getData();
-        if (data != null && data.length > 0)
-            outState.putSerializable(SAVED_STATE_DATA, data);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
@@ -61,7 +54,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         mPreferences = PopMoviesPreferences.getPreferences(getApplication());
         mPreferences.registerChangeListener(this);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, determineSpanCount());
+        GridLayoutManager layoutManager = new GridLayoutManager(this, mPreferences.getColumnSpan());
         mRecyclerViewMovies.setLayoutManager(layoutManager);
 
         mRecyclerViewMovies.setHasFixedSize(true);
@@ -89,13 +82,11 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         loadData();
     }
 
-    private int determineSpanCount() {
-        int orientation = getResources().getConfiguration().orientation;
-
-        if (orientation == Configuration.ORIENTATION_PORTRAIT)
-            return 2;
-        else
-            return 4;
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Movie[] data = mAdapter.getData();
+        if (data != null && data.length > 0)
+            outState.putSerializable(SAVED_STATE_DATA, data);
     }
 
     @Override
@@ -139,17 +130,6 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         dialog.show();
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
-        if (getResources().getString(R.string.pref_sort_order).equals(key)) {
-            Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
-            mAdapter.setData(null);
-            loadData();
-        }
-    }
-
-
     private void loadData() {
         if (!isNetworkConnected()) {
             showNoNetworkErrorView();
@@ -183,6 +163,16 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         NetworkInfo network = connectivityManager.getActiveNetworkInfo();
 
         return ( network != null && network.isConnected() );
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
+        if (getResources().getString(R.string.pref_sort_order).equals(key)) {
+            Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
+            mAdapter.setData(null);
+            loadData();
+        }
     }
 
     private class dataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
@@ -259,6 +249,9 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     @Override
     public void onClick(Movie movie) {
-        //TODO: Implement intent to show movie details.
+        Intent intent = new Intent(getBaseContext(), MovieDetailsActivity.class);
+        intent.putExtra(Movie.MOVIE_CONTENT, movie);
+
+        startActivity(intent);
     }
 }
