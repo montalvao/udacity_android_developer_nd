@@ -1,5 +1,6 @@
 package com.example.android.popmovies.data;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.example.android.popmovies.MoviesActivity;
 import com.example.android.popmovies.R;
 
 /**
@@ -110,5 +112,9 @@ public class PopMoviesPreferences {
         SharedPreferences.Editor editor = mPreferences.edit();
 
         editor.putInt(pref, value).apply();
+    }
+
+    public void registerChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 }

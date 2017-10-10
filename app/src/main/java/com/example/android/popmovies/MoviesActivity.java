@@ -26,6 +26,8 @@ import com.example.android.popmovies.data.PopMoviesPreferences;
 import com.example.android.popmovies.sync.PopMoviesSync;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
 
+import org.parceler.Parcels;
+
 import java.io.IOException;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -33,14 +35,20 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     private static final String TAG = MoviesActivity.class.getSimpleName();
 
+    private static final String SAVED_STATE_DATA = MoviesActivity.class.getSimpleName() + ".STATE_DATA";
+
     private RecyclerView mRecyclerViewMovies;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorTextView;
 
+    private PopMoviesPreferences mPreferences;
     private MoviesAdapter mAdapter;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        Movie[] data = mAdapter.getData();
+        outState.putser
+                putParcelable(SAVED_STATE_DATA, Parcels.wrap(data));
         super.onSaveInstanceState(outState);
     }
 
@@ -58,6 +66,9 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         mLoadingIndicator = (ProgressBar) findViewById(R.id.progressbar_movies);
         mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
+        mPreferences = PopMoviesPreferences.getPreferences(getApplication());
+        mPreferences.registerChangeListener(this);
+
         GridLayoutManager layoutManager = new GridLayoutManager(this, determineSpanCount());
         mRecyclerViewMovies.setLayoutManager(layoutManager);
 
@@ -74,6 +85,11 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
                 loadData();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         loadData();
     }
@@ -98,6 +114,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         int id = item.getItemId();
 
         if (id == R.id.movies_options_sortby) {
+            Log.d(TAG, "[onOptionsItemSelected] id == R.id.movies_options_sortby");
             displaySortOrderDialog();
             return true;
         }
@@ -106,23 +123,32 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     }
 
     private void displaySortOrderDialog() {
-        final PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(getApplication());
+        final int sortOrderIndex = mPreferences.getSortOrderIndex();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.movies_menu_sortby)
                 .setIcon(android.R.drawable.ic_menu_sort_by_size)
-                .setSingleChoiceItems(preferences.getSortOrderOptions(), preferences.getSortOrderIndex(),
+                .setSingleChoiceItems(mPreferences.getSortOrderOptions(), sortOrderIndex,
                         new AlertDialog.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int index) {
-                                preferences.setSortOrder(index);
+                                if (index != sortOrderIndex)
+                                    mPreferences.setSortOrder(index);
+
+                                dialog.dismiss();
                             }
                         });
+
+        AlertDialog dialog = builder.create();
+
+        dialog.show();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
         if (getResources().getString(R.string.pref_sort_order).equals(key)) {
+            Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
             mAdapter.setData(null);
             loadData();
         }
@@ -136,8 +162,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         }
 
         dataSyncTask dataSyncTask = new dataSyncTask();
-        PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(getApplication());
-        String sortOrder = preferences.getSortOrder();
+        String sortOrder = mPreferences.getSortOrder();
         Resources resources = getResources();
 
         //------ Load from TMDB --------------------------------------------------
@@ -205,7 +230,6 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
                 showSyncErrorView();
             }
         }
-
     }
 
     private void showNoNetworkErrorView() {

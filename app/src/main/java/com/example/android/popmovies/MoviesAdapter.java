@@ -2,16 +2,12 @@ package com.example.android.popmovies;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -50,8 +46,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         private final ProgressBar mProgressBar;
         private final TextView mTitleView;
         private final ImageView mPosterView;
-        private final int thumbnailWidth;
-        private final int thumbnailHeight;
 
         MoviesAdapterViewHolder(View view) {
             super(view);
@@ -64,8 +58,10 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(
                     (Application) mContext.getApplicationContext());
 
-            thumbnailWidth = preferences.getThumbnailWidth();
-            thumbnailHeight = preferences.getThumbnailHeight();
+            mPosterView.getLayoutParams().width = preferences.getThumbnailWidth();
+            mPosterView.getLayoutParams().height = preferences.getThumbnailHeight();
+
+            Log.d(TAG, "Thumbnail width = " + preferences.getThumbnailWidth() + " height = " + preferences.getThumbnailHeight());
 
             view.setOnClickListener(this);
         }
@@ -76,7 +72,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
             mPosterView.setContentDescription(title);
             Picasso.with(mContext).load(posterUri)
-                    .resize(thumbnailWidth, thumbnailHeight)
+                    .fit()
                     .into(mPosterView, this);
 
             mPosterView.setVisibility(View.VISIBLE);
@@ -155,5 +151,9 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
     public void setData(Movie[] moviesData) {
         mMoviesData = moviesData;
         notifyDataSetChanged();
+    }
+
+    public Movie[] getData() {
+        return mMoviesData;
     }
 }

@@ -21,7 +21,7 @@ public class TMDBHelper {
     private static final String API_URI_BASE = "https://api.themoviedb.org/3";
     private static final String API_MOVIE_PATH = "movie";
     private static final String API_MOVIE_LIST_BY_POPULARITY = "popular";
-    private static final String API_MOVIE_LIST_BY_RATING = "rop_rated";
+    private static final String API_MOVIE_LIST_BY_RATING = "top_rated";
     private static final String API_KEY_QUERY_KEY = "api_key";
     private static final String IMAGE_URI_BASE = "http://image.tmdb.org/t/p";
 
