@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_thumbnail_width">pref_thumbnail_width_port</string>
-    <string name="pref_thumbnail_height">pref_thumbnail_height_port</string>
-    <string name="pref_column_span">pref_column_span_port</string>
-    <integer name="column_span_default">2</integer>
+    <integer name="recyclerview_gridlayout_column_span">2</integer>
 </resources>

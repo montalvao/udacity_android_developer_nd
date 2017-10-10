@@ -15,10 +15,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-/**
- * Created by rodrigo.montalvao on 06/10/2017.
- */
-
 public class PopMoviesWebSync implements PopMoviesSync {
 
     @Retention(RetentionPolicy.SOURCE)

@@ -54,7 +54,9 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         mPreferences = PopMoviesPreferences.getPreferences(getApplication());
         mPreferences.registerChangeListener(this);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, mPreferences.getColumnSpan());
+        GridLayoutManager layoutManager = new GridLayoutManager(this,
+                getResources().getInteger(R.integer.recyclerview_gridlayout_column_span));
+
         mRecyclerViewMovies.setLayoutManager(layoutManager);
 
         mRecyclerViewMovies.setHasFixedSize(true);

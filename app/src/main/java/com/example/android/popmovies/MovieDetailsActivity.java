@@ -27,6 +27,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
+        //TODO: Use butterknife
         mTitleTextView = (TextView) findViewById(R.id.textview_details_title);
         mTitleOriginalTextView = (TextView) findViewById(R.id.textview_details_titleoriginal);
         mUserRatingTextView = (TextView) findViewById(R.id.textview_details_user_rating);

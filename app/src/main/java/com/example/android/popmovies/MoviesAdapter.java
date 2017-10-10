@@ -1,33 +1,21 @@
 package com.example.android.popmovies;
 
-import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popmovies.data.Movie;
-import com.example.android.popmovies.data.PopMoviesPreferences;
 import com.example.android.popmovies.sync.TMDBHelper;
 import com.example.android.popmovies.utilities.PopMoviesUtilities;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-/**
- * Created by rodrigo.montalvao on 06/10/2017.
- */
-
 class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
-
-    private static final String TAG = MoviesAdapter.class.getSimpleName();
-
-    public static final String MOVIES_DATA = MoviesAdapter.class.getName() + ".MOVIES_DATA";
 
     private Movie[] mMoviesData = null;
 
@@ -43,7 +31,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Callback {
         private final Context mContext;
-        private final ProgressBar mProgressBar;
         private final TextView mTitleView;
         private final ImageView mPosterView;
 
@@ -51,27 +38,18 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             super(view);
 
             mContext = view.getContext();
-            mProgressBar = (ProgressBar) view.findViewById(R.id.progressbar_movie_item);
             mTitleView = (TextView) view.findViewById(R.id.textview_movie_item);
             mPosterView = (ImageView) view.findViewById(R.id.imageview_movie_item_poster);
-
-            PopMoviesPreferences preferences = PopMoviesPreferences.getPreferences(
-                    (Application) mContext.getApplicationContext());
-
-            mPosterView.getLayoutParams().width = preferences.getThumbnailWidth();
-            mPosterView.getLayoutParams().height = preferences.getThumbnailHeight();
-
-            Log.d(TAG, "Thumbnail width = " + preferences.getThumbnailWidth() + " height = " + preferences.getThumbnailHeight());
 
             view.setOnClickListener(this);
         }
 
         void showPoster(Uri posterUri, String title) {
             mTitleView.setVisibility(View.INVISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
 
             mPosterView.setContentDescription(title);
             Picasso.with(mContext).load(posterUri)
+                    .centerInside()
                     .fit()
                     .into(mPosterView, this);
 
@@ -80,17 +58,9 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
         void showTitle(String title) {
             mPosterView.setVisibility(View.INVISIBLE);
-            mProgressBar.setVisibility(View.INVISIBLE);
 
             mTitleView.setText(title);
             mTitleView.setVisibility(View.VISIBLE);
-        }
-
-        void showLoading() {
-            mTitleView.setVisibility(View.INVISIBLE);
-            mPosterView.setVisibility(View.INVISIBLE);
-
-            mProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -107,8 +77,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             String title = mPosterView.getContentDescription().toString();
             if (!title.isEmpty()) {
                 showTitle(title);
-            } else {
-                showLoading();
             }
         }
     }
@@ -134,8 +102,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
             String title = item.title;
             if (title != null && !title.isEmpty()) {
                 holder.showTitle(PopMoviesUtilities.truncateTitle(title));
-            } else {
-                holder.showLoading();
             }
         }
     }
