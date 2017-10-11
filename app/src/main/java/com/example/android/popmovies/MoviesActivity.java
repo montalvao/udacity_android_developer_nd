@@ -72,7 +72,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         });
 
         if (savedInstanceState != null) {
-            Movie[] data = (Movie[]) savedInstanceState.getSerializable(SAVED_STATE_DATA);
+            Movie[] data = (Movie[]) savedInstanceState.getParcelableArray(SAVED_STATE_DATA);
             if (data != null && data.length > 0) {
                 mAdapter.setData(data);
                 return;
@@ -93,7 +93,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     protected void onSaveInstanceState(Bundle outState) {
         Movie[] data = mAdapter.getData();
         if (data != null && data.length > 0)
-            outState.putSerializable(SAVED_STATE_DATA, data);
+            outState.putParcelableArray(SAVED_STATE_DATA, data);
     }
 
     @Override
