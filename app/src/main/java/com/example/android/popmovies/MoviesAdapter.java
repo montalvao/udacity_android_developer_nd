@@ -15,6 +15,9 @@ import com.example.android.popmovies.utilities.PopMoviesUtilities;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
 
     private Movie[] mMoviesData = null;
@@ -31,15 +34,16 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Callback {
         private final Context mContext;
-        private final TextView mTitleView;
-        private final ImageView mPosterView;
+
+        @BindView(R.id.movieitem_view_title) TextView mTitleView;
+        @BindView(R.id.movieitem_view_poster) ImageView mPosterView;
 
         MoviesAdapterViewHolder(View view) {
             super(view);
 
             mContext = view.getContext();
-            mTitleView = (TextView) view.findViewById(R.id.textview_movie_item);
-            mPosterView = (ImageView) view.findViewById(R.id.imageview_movie_item_poster);
+
+            ButterKnife.bind(this, view);
 
             view.setOnClickListener(this);
         }

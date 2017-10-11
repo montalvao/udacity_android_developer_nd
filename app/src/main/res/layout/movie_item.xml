@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/textview_movie_item"
+        android:id="@+id/movieitem_view_title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1.5"
@@ -17,7 +17,7 @@
         android:padding="16dp"/>
 
     <ImageView
-        android:id="@+id/imageview_movie_item_poster"
+        android:id="@+id/movieitem_view_poster"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintDimensionRatio="1:1.5"
