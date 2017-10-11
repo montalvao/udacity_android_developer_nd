@@ -71,7 +71,7 @@ public class PopMoviesWebSync implements PopMoviesSync {
 
     public static class Builder {
 
-        private PopMoviesWebSync mWebSyncInstance;
+        private final PopMoviesWebSync mWebSyncInstance;
 
         public Builder() {
             mWebSyncInstance = new PopMoviesWebSync();

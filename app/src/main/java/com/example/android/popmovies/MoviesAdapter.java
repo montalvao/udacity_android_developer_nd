@@ -22,7 +22,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     private Movie[] mMoviesData = null;
 
-    private MoviesAdapterOnClickListener mOnClickListener;
+    private final MoviesAdapterOnClickListener mOnClickListener;
 
     interface MoviesAdapterOnClickListener {
         void onClick(Movie movie);

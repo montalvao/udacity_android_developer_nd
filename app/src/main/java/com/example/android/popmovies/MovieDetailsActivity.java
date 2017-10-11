@@ -44,6 +44,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mTitleView.setText(mMovie.title);
         mTitleOriginalView.setText(mMovie.titleOriginal);
         mSynopsisView.setText(mMovie.synopsis);
+        mPosterView.setContentDescription(mMovie.title);
 
         String ratingString = getResources().getString(R.string.movie_details_rating, mMovie.rating);
         mRatingView.setText(ratingString);

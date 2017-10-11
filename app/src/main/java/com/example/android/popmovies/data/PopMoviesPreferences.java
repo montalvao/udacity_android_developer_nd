@@ -1,11 +1,9 @@
 package com.example.android.popmovies.data;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
-import com.example.android.popmovies.MoviesActivity;
 import com.example.android.popmovies.R;
 
 public class PopMoviesPreferences {

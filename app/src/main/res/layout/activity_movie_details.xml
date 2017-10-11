@@ -10,12 +10,12 @@
         android:id="@+id/moviesdetails_view_poster"
         android:layout_width="180dp"
         android:layout_height="0dp"
+        android:contentDescription="@string/movie_cover"
         app:layout_constraintDimensionRatio="1:1.5"
         app:srcCompat="@android:color/background_dark"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp" />
 
     <TextView

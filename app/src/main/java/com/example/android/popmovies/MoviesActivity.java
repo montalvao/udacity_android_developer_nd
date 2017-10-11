@@ -106,7 +106,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.movies_options_sortby) {
+        if (id == R.id.movies_menu_item_sortby) {
             Log.d(TAG, "[onOptionsItemSelected] id == R.id.movies_options_sortby");
             displaySortOrderDialog();
             return true;

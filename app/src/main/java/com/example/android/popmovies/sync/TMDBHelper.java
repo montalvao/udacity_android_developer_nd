@@ -10,10 +10,6 @@ import com.google.gson.annotations.SerializedName;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by rodrigo.montalvao on 06/10/2017.
- */
-
 public class TMDBHelper {
 
     private static final String TAG = TMDBHelper.class.getSimpleName();
@@ -27,11 +23,11 @@ public class TMDBHelper {
 
     private static final String API_KEY = BuildConfig.TMDB_API_KEY;
 
-    public static URL getListedByPopularityURL() {
+    static URL getListedByPopularityURL() {
         return buildAPIQueryURL(API_MOVIE_LIST_BY_POPULARITY);
     }
 
-    public static URL getListedByRatingURL() {
+    static URL getListedByRatingURL() {
         return buildAPIQueryURL(API_MOVIE_LIST_BY_RATING);
     }
 
@@ -78,14 +74,14 @@ public class TMDBHelper {
         return result;
     }
 
-    public static class APIResponseJSON {
+    static class APIResponseJSON {
         @SerializedName("results") private final Movie[] mResults;
 
         public APIResponseJSON(Movie[] results) {
             mResults = results;
         }
 
-        public Movie[] getResults() {
+        Movie[] getResults() {
             return mResults;
         }
     }
