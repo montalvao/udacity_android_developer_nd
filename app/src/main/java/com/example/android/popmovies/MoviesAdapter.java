@@ -49,7 +49,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
             mPosterView.setContentDescription(title);
             Picasso.with(mContext).load(posterUri)
-                    .centerInside()
+                    .centerCrop()
                     .fit()
                     .into(mPosterView, this);
 
