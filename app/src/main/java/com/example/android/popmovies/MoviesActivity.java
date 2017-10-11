@@ -32,7 +32,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
-        MoviesAdapter.MoviesAdapterOnClickListener {
+        MoviesAdapter.MoviesAdapterOnClickListener, DialogInterface.OnClickListener {
 
     private static final String TAG = MoviesActivity.class.getSimpleName();
 
@@ -42,16 +42,15 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     @BindView(R.id.movies_view_loading_indicator) ProgressBar mLoadingIndicatorView;
     @BindView(R.id.movies_view_error_text) TextView mErrorTextView;
 
-    private PopMoviesPreferences mPreferences;
     private MoviesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_movies);
 
-        mPreferences = PopMoviesPreferences.getPreferences(getApplication());
-        mPreferences.registerChangeListener(this);
+        PopMoviesPreferences.registerChangeListener(getApplication(), this);
 
         mAdapter = new MoviesAdapter(this);
 
@@ -84,6 +83,13 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     }
 
     @Override
+    protected void onDestroy() {
+        PopMoviesPreferences.unregisterChangeListener(getApplication(), this);
+
+        super.onDestroy();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         Movie[] data = mAdapter.getData();
         if (data != null && data.length > 0)
@@ -110,25 +116,24 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     }
 
     private void displaySortOrderDialog() {
-        final int sortOrderIndex = mPreferences.getSortOrderIndex();
+        final String[] sortOrderArray = PopMoviesPreferences.getSortOrderArray(this);
+
+        int sortOrderItem = PopMoviesPreferences.getSortOrder(this);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.movies_menu_sortby)
                 .setIcon(android.R.drawable.ic_menu_sort_by_size)
-                .setSingleChoiceItems(mPreferences.getSortOrderOptions(), sortOrderIndex,
-                        new AlertDialog.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int index) {
-                                if (index != sortOrderIndex)
-                                    mPreferences.setSortOrder(index);
-
-                                dialog.dismiss();
-                            }
-                        });
+                .setSingleChoiceItems(sortOrderArray, sortOrderItem, this);
 
         AlertDialog dialog = builder.create();
 
         dialog.show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        PopMoviesPreferences.setSortOrder(this, which);
+        dialog.dismiss();
     }
 
     private void loadData() {
@@ -138,7 +143,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         }
 
         dataSyncTask dataSyncTask = new dataSyncTask();
-        String sortOrder = mPreferences.getSortOrder();
+        String sortOrder = PopMoviesPreferences.getSortOrderName(this);
         Resources resources = getResources();
 
         //------ Load from TMDB --------------------------------------------------
@@ -169,7 +174,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
-        if (getResources().getString(R.string.pref_sort_order).equals(key)) {
+        if (getResources().getString(R.string.pref_movies_sort_order_index).equals(key)) {
             Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
             mAdapter.setData(null);
             loadData();

@@ -3,66 +3,51 @@ package com.example.android.popmovies.data;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 
+import com.example.android.popmovies.MoviesActivity;
 import com.example.android.popmovies.R;
 
 public class PopMoviesPreferences {
 
     private static final String PREFERENCES_NAME = PopMoviesPreferences.class.getName();
 
-    private static PopMoviesPreferences mInstance;
-
-    private Context mContext;
-    private SharedPreferences mPreferences;
-
-    private PopMoviesPreferences(Application app) {
-        mContext = app.getApplicationContext();
-        mPreferences = app.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+    public static void registerChangeListener(Context c, SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        getPreferences(c).registerOnSharedPreferenceChangeListener(listener);
     }
 
-    public static PopMoviesPreferences getPreferences(Application app) {
-        if (mInstance == null)
-            mInstance = new PopMoviesPreferences(app);
-
-        return mInstance;
+    public static void unregisterChangeListener(Context c, SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        getPreferences(c).unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    public String[] getSortOrderOptions() {
-        return mContext.getResources().getStringArray(R.array.pref_movies_sortby_options);
+    public static String[] getSortOrderArray(Context context) {
+        return context.getResources().getStringArray(R.array.pref_movies_sort_order_array);
     }
 
-    public int getSortOrderIndex() {
-        String pref = mContext.getResources().getString(R.string.pref_sort_order);
+    public static int getSortOrder(Context c) {
+        Resources res = c.getResources();
+        final String prefName = res.getString(R.string.pref_movies_sort_order_index);
+        final int prefDefault = res.getInteger(R.integer.pref_movies_sort_order_index_default);
 
-        if (mPreferences.contains(pref))
-            return mPreferences.getInt(pref, -1);
-
-        int result = mContext.getResources().getInteger(R.integer.movies_sortby_options_default);
-
-        savePreference(pref, result);
-
-        return result;
+        return getPreferences(c).getInt(prefName, prefDefault);
     }
 
-    public String getSortOrder() {
-        String[] options = getSortOrderOptions();
-        int index = getSortOrderIndex();
+    public static String getSortOrderName(Context c) {
+        String[] options = getSortOrderArray(c);
+        int index = getSortOrder(c);
 
         return options[index];
     }
 
-    public void setSortOrder(int value) {
-        String pref = mContext.getResources().getString(R.string.pref_sort_order);
-        savePreference(pref, value);
+    public static void setSortOrder(Context c, int value) {
+        final String prefName = c.getResources().getString(R.string.pref_movies_sort_order_index);
+        SharedPreferences.Editor editor = getPreferences(c).edit();
+
+        editor.putInt(prefName, value)
+                .apply();
     }
 
-    private void savePreference(String pref, int value) {
-        SharedPreferences.Editor editor = mPreferences.edit();
-
-        editor.putInt(pref, value).apply();
-    }
-
-    public void registerChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        mPreferences.registerOnSharedPreferenceChangeListener(listener);
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 }

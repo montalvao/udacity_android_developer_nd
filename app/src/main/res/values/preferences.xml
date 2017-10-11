@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pref_sort_order">pref_sort_order</string>
-    <string-array name="pref_movies_sortby_options">
+    <string name="pref_movies_sort_order_index">pref_sort_order</string>
+    <string-array name="pref_movies_sort_order_array">
         <item>@string/movies_sortby_popularity</item>
         <item>@string/movies_sortby_rating</item>
     </string-array>
-    <integer name="movies_sortby_options_default">0</integer>
+    <integer name="pref_movies_sort_order_index_default">0</integer>
 </resources>
