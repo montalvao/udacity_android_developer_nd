@@ -95,7 +95,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
         Movie item = mMoviesData[position];
 
-        Uri posterUri = TMDBHelper.getPosterUri(item.posterThumbFilename);
+        Uri posterUri = TMDBHelper.getPosterUri(item.posterPath);
         if (posterUri != null) {
             holder.showPoster(posterUri, item.title);
         } else {

@@ -28,6 +28,9 @@ import com.example.android.popmovies.sync.PopMoviesWebSync;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener {
 
@@ -35,9 +38,9 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     private static final String SAVED_STATE_DATA = MoviesActivity.class.getSimpleName() + ".STATE_DATA";
 
-    private RecyclerView mRecyclerViewMovies;
-    private ProgressBar mLoadingIndicator;
-    private TextView mErrorTextView;
+    @BindView(R.id.movies_recyclerview) RecyclerView mMoviesRecyclerView;
+    @BindView(R.id.movies_view_loading_indicator) ProgressBar mLoadingIndicatorView;
+    @BindView(R.id.movies_view_error_text) TextView mErrorTextView;
 
     private PopMoviesPreferences mPreferences;
     private MoviesAdapter mAdapter;
@@ -47,23 +50,19 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 
-        mErrorTextView = (TextView) findViewById(R.id.textview_error_panel);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.progressbar_movies);
-        mRecyclerViewMovies = (RecyclerView) findViewById(R.id.recyclerview_movies);
-
         mPreferences = PopMoviesPreferences.getPreferences(getApplication());
         mPreferences.registerChangeListener(this);
+
+        mAdapter = new MoviesAdapter(this);
+
+        ButterKnife.bind(this);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this,
                 getResources().getInteger(R.integer.recyclerview_gridlayout_column_span));
 
-        mRecyclerViewMovies.setLayoutManager(layoutManager);
-
-        mRecyclerViewMovies.setHasFixedSize(true);
-
-        mAdapter = new MoviesAdapter(this);
-
-        mRecyclerViewMovies.setAdapter(mAdapter);
+        mMoviesRecyclerView.setLayoutManager(layoutManager);
+        mMoviesRecyclerView.setHasFixedSize(true);
+        mMoviesRecyclerView.setAdapter(mAdapter);
 
         mErrorTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,7 +207,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
         @Override
         protected void onPostExecute(Movie[] data) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            mLoadingIndicatorView.setVisibility(View.INVISIBLE);
             if (data != null && data.length > 0) {
                 Log.d(TAG, "[onPostExecute] data.length = " + data.length);
                 mAdapter.setData(data);
@@ -228,8 +227,8 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
     }
 
     private void showErrorView(@StringRes int errorStringRes) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        mRecyclerViewMovies.setVisibility(View.INVISIBLE);
+        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
+        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
 
         mErrorTextView.setText(errorStringRes);
         mErrorTextView.setVisibility(View.VISIBLE);
@@ -237,16 +236,16 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     private void showLoadingView() {
         mErrorTextView.setVisibility(View.INVISIBLE);
-        mRecyclerViewMovies.setVisibility(View.INVISIBLE);
+        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
 
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mLoadingIndicatorView.setVisibility(View.VISIBLE);
     }
 
     private void showMoviesView() {
         mErrorTextView.setVisibility(View.INVISIBLE);
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
 
-        mRecyclerViewMovies.setVisibility(View.VISIBLE);
+        mMoviesRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override

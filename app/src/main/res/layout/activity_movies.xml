@@ -4,14 +4,14 @@
     android:layout_height="match_parent">
 
     <ProgressBar
-        android:id="@+id/progressbar_movies"
+        android:id="@+id/movies_view_loading_indicator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="36dp"
         android:visibility="invisible" />
 
     <TextView
-        android:id="@+id/textview_error_panel"
+        android:id="@+id/movies_view_error_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="36sp"
@@ -20,7 +20,7 @@
         android:visibility="invisible" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_movies"
+        android:id="@+id/movies_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
