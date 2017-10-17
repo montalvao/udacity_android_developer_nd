@@ -32,57 +32,13 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         mOnClickListener = listener;
     }
 
-    class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Callback {
-        private final Context mContext;
+    public Movie[] getData() {
+        return mMoviesData;
+    }
 
-        @BindView(R.id.movieitem_view_title) TextView mTitleView;
-        @BindView(R.id.movieitem_view_poster) ImageView mPosterView;
-
-        MoviesAdapterViewHolder(View view) {
-            super(view);
-
-            mContext = view.getContext();
-
-            ButterKnife.bind(this, view);
-
-            view.setOnClickListener(this);
-        }
-
-        void showPoster(Uri posterUri, String title) {
-            mTitleView.setVisibility(View.INVISIBLE);
-
-            mPosterView.setContentDescription(title);
-            Picasso.with(mContext).load(posterUri)
-                    .centerCrop()
-                    .fit()
-                    .into(mPosterView, this);
-
-            mPosterView.setVisibility(View.VISIBLE);
-        }
-
-        void showTitle(String title) {
-            mPosterView.setVisibility(View.INVISIBLE);
-
-            mTitleView.setText(title);
-            mTitleView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        public void onClick(View v) {
-            int index = getAdapterPosition();
-            mOnClickListener.onClick(mMoviesData[index]);
-        }
-
-        @Override
-        public void onSuccess() {}
-
-        @Override
-        public void onError() {
-            String title = mPosterView.getContentDescription().toString();
-            if (!title.isEmpty()) {
-                showTitle(title);
-            }
-        }
+    public void setData(Movie[] moviesData) {
+        mMoviesData = moviesData;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -105,7 +61,7 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         } else {
             String title = item.title;
             if (title != null && !title.isEmpty()) {
-                holder.showTitle(PopMoviesUtilities.truncateTitle(title));
+                holder.showTitle(title);
             }
         }
     }
@@ -118,12 +74,84 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         return mMoviesData.length;
     }
 
-    public void setData(Movie[] moviesData) {
-        mMoviesData = moviesData;
-        notifyDataSetChanged();
-    }
+    class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, Callback {
+        private final Context mContext;
 
-    public Movie[] getData() {
-        return mMoviesData;
+        @BindView(R.id.movieitem_view_title) TextView mTitleView;
+        @BindView(R.id.movieitem_view_poster) ImageView mPosterView;
+
+        MoviesAdapterViewHolder(View view) {
+            super(view);
+
+            mContext = view.getContext();
+
+            ButterKnife.bind(this, view);
+
+            view.setOnClickListener(this);
+        }
+
+        /**
+         * Method showPoster(), loads the poster image in the Image View. It uses Picasso to manage
+         * connection and cache. The resulting image is loaded to the view also by Picasso, which also
+         * calls {@link Callback} methods when finished.
+         *
+         * @param posterUri     The URI (built from the web service + image name)
+         * @param title         The movie title (to be used as Content Description)
+         *
+         * @see <a href="http://square.github.io/picasso/" />
+         */
+        void showPoster(Uri posterUri, String title) {
+            mTitleView.setVisibility(View.INVISIBLE);
+
+            mPosterView.setContentDescription(title);
+            Picasso.with(mContext).load(posterUri)
+                    .centerCrop()
+                    .fit()
+                    .into(mPosterView, this);
+
+            mPosterView.setVisibility(View.VISIBLE);
+        }
+
+        /**
+         * Shows the movie name (truncated) in a poorly stylized poster.
+         *
+         * @param title The movie title.
+         */
+        void showTitle(String title) {
+            mPosterView.setVisibility(View.INVISIBLE);
+
+            mTitleView.setText(PopMoviesUtilities.truncateTitle(title));
+            mTitleView.setVisibility(View.VISIBLE);
+        }
+
+        /**
+         * Method onClick() from Interface {@link View.OnClickListener}, passes the click in the
+         * recycle view item's handling to the Adapter's listener.
+         *
+         * @param v     The recycler view item.
+         */
+        @Override
+        public void onClick(View v) {
+            int index = getAdapterPosition();
+            mOnClickListener.onClick(mMoviesData[index]);
+        }
+
+        /**
+         * Method onSuccess{} from Picasso's {@link Callback} interface.
+         */
+        @Override
+        public void onSuccess() {}
+
+        /**
+         * Method onError() from Picasso's {@link Callback} interface, calls a fallback UI method
+         * to give the user at least a hint of which movie it is.
+         */
+        @Override
+        public void onError() {
+            String title = mPosterView.getContentDescription().toString();
+            if (!title.isEmpty()) {
+                showTitle(title);
+            }
+        }
     }
 }

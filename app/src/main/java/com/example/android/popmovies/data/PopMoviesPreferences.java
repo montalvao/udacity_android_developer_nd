@@ -6,6 +6,9 @@ import android.content.res.Resources;
 
 import com.example.android.popmovies.R;
 
+/**
+ * Class PopMoviesPreferences: static methods to mediate dealing with the app's Shared Preferences.
+ */
 public class PopMoviesPreferences {
 
     private static final String PREFERENCES_NAME = PopMoviesPreferences.class.getName();
@@ -18,8 +21,8 @@ public class PopMoviesPreferences {
         getPreferences(c).unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    public static String[] getSortOrderArray(Context context) {
-        return context.getResources().getStringArray(R.array.pref_movies_sort_order_array);
+    public static String[] getSortOrderArray(Context c) {
+        return c.getResources().getStringArray(R.array.pref_movies_sort_order_array);
     }
 
     public static int getSortOrder(Context c) {
@@ -45,7 +48,7 @@ public class PopMoviesPreferences {
                 .apply();
     }
 
-    private static SharedPreferences getPreferences(Context context) {
-        return context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+    private static SharedPreferences getPreferences(Context c) {
+        return c.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
     }
 }

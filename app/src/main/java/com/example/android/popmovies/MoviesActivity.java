@@ -112,14 +112,85 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
         if (id == R.id.movies_menu_item_sortby) {
             Log.d(TAG, "[onOptionsItemSelected] id == R.id.movies_options_sortby");
-            displaySortOrderDialog();
+            showSortOrderDialog();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void displaySortOrderDialog() {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
+        if (getResources().getString(R.string.pref_movies_sort_order_index).equals(key)) {
+            Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
+            mAdapter.setData(null);
+            loadData();
+        }
+    }
+
+    /**
+     * Method onClick() from Interface {@link DialogInterface.OnClickListener}, handles the answer to
+     * the Sort Order choosing dialog (preferences).
+     *
+     * @param dialog    The dialog (UI element).
+     * @param sortOrder The chosen option. Since the Sort Order Array was used to build the dialog,
+     *                  this index is related to the sort order option in the array.
+     */
+    @Override
+    public void onClick(DialogInterface dialog, int sortOrder) {
+        PopMoviesPreferences.setSortOrder(this, sortOrder);
+        dialog.dismiss();
+    }
+
+    /**
+     * Method onClick() from Interface {@link MoviesAdapter.MoviesAdapterOnClickListener}, handles the
+     * clicked recycle view item (choosing a movie from the list).
+     *
+     * @param movie The chosen item.
+     */
+    @Override
+    public void onClick(Movie movie) {
+        Intent intent = new Intent(getBaseContext(), MovieDetailsActivity.class);
+        intent.putExtra(Movie.MOVIE_CONTENT, movie);
+
+        startActivity(intent);
+    }
+
+    private void loadData() {
+        if (!isNetworkConnected()) {
+            /* In the future data may be persisted in a db to be used offline */
+            showNoNetworkErrorView();
+            return;
+        }
+
+        DataSyncTask syncTask = new DataSyncTask();
+        /*
+         * Currently the only option available is syncing from TMDB, but the Interface PopMoviesSync
+         * allows for easy experiments with other methods.
+         */
+        PopMoviesSync syncEngine = buildWebSyncEngine();
+
+        syncTask.execute(syncEngine);
+    }
+
+    private PopMoviesSync buildWebSyncEngine() {
+        String sortOrder = PopMoviesPreferences.getSortOrderName(this);
+        Resources resources = getResources();
+
+        PopMoviesWebSync.Builder builder = new PopMoviesWebSync.Builder();
+        if (sortOrder.equals(resources.getString(R.string.movies_sortby_popularity))) {
+            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_POPULARITY);
+        } else if (sortOrder.equals(resources.getString(R.string.movies_sortby_rating))) {
+            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_RATING);
+        } else {
+            throw new RuntimeException();
+        }
+
+        return builder.build();
+    }
+
+    private void showSortOrderDialog() {
         final String[] sortOrderArray = PopMoviesPreferences.getSortOrderArray(this);
 
         int sortOrderItem = PopMoviesPreferences.getSortOrder(this);
@@ -134,36 +205,34 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         dialog.show();
     }
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        PopMoviesPreferences.setSortOrder(this, which);
-        dialog.dismiss();
+    private void showLoadingView() {
+        mErrorTextView.setVisibility(View.INVISIBLE);
+        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
+
+        mLoadingIndicatorView.setVisibility(View.VISIBLE);
     }
 
-    private void loadData() {
-        if (!isNetworkConnected()) {
-            showNoNetworkErrorView();
-            return;
-        }
+    private void showMoviesView() {
+        mErrorTextView.setVisibility(View.INVISIBLE);
+        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
 
-        dataSyncTask dataSyncTask = new dataSyncTask();
-        String sortOrder = PopMoviesPreferences.getSortOrderName(this);
-        Resources resources = getResources();
+        mMoviesRecyclerView.setVisibility(View.VISIBLE);
+    }
 
-        //------ Load from TMDB --------------------------------------------------
-        PopMoviesWebSync.Builder builder = new PopMoviesWebSync.Builder();
-        if (sortOrder.equals(resources.getString(R.string.movies_sortby_popularity))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_POPULARITY);
-        } else if (sortOrder.equals(resources.getString(R.string.movies_sortby_rating))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_RATING);
-        } else {
-            throw new RuntimeException();
-        }
+    private void showNoNetworkErrorView() {
+        showErrorView(R.string.error_panel_nonetwork);
+    }
 
-        PopMoviesSync syncEngine = builder.build();
-        //------------------------------------------------------------------------
+    private void showSyncErrorView() {
+        showErrorView(R.string.error_panel_sync);
+    }
 
-        dataSyncTask.execute(syncEngine);
+    private void showErrorView(@StringRes int errorStringRes) {
+        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
+        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
+
+        mErrorTextView.setText(errorStringRes);
+        mErrorTextView.setVisibility(View.VISIBLE);
     }
 
     private boolean isNetworkConnected() {
@@ -175,17 +244,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         return ( network != null && network.isConnected() );
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.d(TAG, "[onSharedPreferenceChanged] key = " + key);
-        if (getResources().getString(R.string.pref_movies_sort_order_index).equals(key)) {
-            Log.d(TAG, "[onSharedPreferenceChanged] pref_sort_order.equals(key)");
-            mAdapter.setData(null);
-            loadData();
-        }
-    }
-
-    private class dataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
+    private class DataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
 
         @Override
         protected void onPreExecute() {
@@ -216,52 +275,12 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
         @Override
         protected void onPostExecute(Movie[] data) {
-            mLoadingIndicatorView.setVisibility(View.INVISIBLE);
             if (data != null && data.length > 0) {
-                Log.d(TAG, "[onPostExecute] data.length = " + data.length);
                 mAdapter.setData(data);
                 showMoviesView();
             } else {
                 showSyncErrorView();
             }
         }
-    }
-
-    private void showNoNetworkErrorView() {
-        showErrorView(R.string.error_panel_nonetwork);
-    }
-
-    private void showSyncErrorView() {
-        showErrorView(R.string.error_panel_sync);
-    }
-
-    private void showErrorView(@StringRes int errorStringRes) {
-        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
-        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
-
-        mErrorTextView.setText(errorStringRes);
-        mErrorTextView.setVisibility(View.VISIBLE);
-    }
-
-    private void showLoadingView() {
-        mErrorTextView.setVisibility(View.INVISIBLE);
-        mMoviesRecyclerView.setVisibility(View.INVISIBLE);
-
-        mLoadingIndicatorView.setVisibility(View.VISIBLE);
-    }
-
-    private void showMoviesView() {
-        mErrorTextView.setVisibility(View.INVISIBLE);
-        mLoadingIndicatorView.setVisibility(View.INVISIBLE);
-
-        mMoviesRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onClick(Movie movie) {
-        Intent intent = new Intent(getBaseContext(), MovieDetailsActivity.class);
-        intent.putExtra(Movie.MOVIE_CONTENT, movie);
-
-        startActivity(intent);
     }
 }

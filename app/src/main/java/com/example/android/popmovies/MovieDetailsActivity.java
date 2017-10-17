@@ -37,22 +37,34 @@ public class MovieDetailsActivity extends AppCompatActivity {
             mMovie = intent.getParcelableExtra(Movie.MOVIE_CONTENT);
             if (mMovie != null)
                 showData();
+            else
+                throw new RuntimeException();
         }
     }
 
+    /**
+     * Method showData(), loads the retrieved data to the views. The poster image is loaded using
+     * Picasso. Since Picasso manages its cache, avoiding reloading from the Internet when possible,
+     * instead of receiving the poster image via intent, this activity uses poster name once again, and
+     * builds the Uri. Thus in the future this activity can show the same poster in a different
+     * size.
+     *
+     * @see <a href="http://square.github.io/picasso/" />
+     */
     private void showData() {
         mTitleView.setText(mMovie.title);
         mTitleOriginalView.setText(mMovie.titleOriginal);
         mSynopsisView.setText(mMovie.synopsis);
         mPosterView.setContentDescription(mMovie.title);
 
-        String ratingString = getResources().getString(R.string.movie_details_rating, mMovie.rating);
-        mRatingView.setText(ratingString);
+        String rating = getResources().getString(R.string.movie_details_rating, mMovie.rating);
+        mRatingView.setText(rating);
 
         Uri posterUri = TMDBHelper.getPosterUri(mMovie.posterPath);
 
         Picasso.with(getBaseContext()).load(posterUri)
-                .centerCrop().fit()
+                .centerCrop()
+                .fit()
                 .into(mPosterView);
     }
 }

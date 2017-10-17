@@ -5,6 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class Movie: the movie model.
+ *
+ * It is annotated to be used by GSon to deserialize JSON data.
+ */
 public class Movie implements Parcelable {
 
     public static final String MOVIE_CONTENT = Movie.class.getSimpleName() + ".MOVIE_CONTENT";
