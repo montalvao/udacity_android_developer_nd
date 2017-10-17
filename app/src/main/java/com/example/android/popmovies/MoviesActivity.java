@@ -34,10 +34,6 @@ import butterknife.ButterKnife;
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
         MoviesAdapter.MoviesAdapterOnClickListener, DialogInterface.OnClickListener {
 
-    //TODO: To add comments to methods and classes.
-    //TODO: To do some more refactoring: SortBy -> Sort Order ? Better naming... shorter methods etc.
-    //TODO: To reorder methods in classes (public -> protected -> private)
-
     private static final String TAG = MoviesActivity.class.getSimpleName();
 
     private static final String SAVED_STATE_DATA = MoviesActivity.class.getSimpleName() + ".STATE_DATA";
