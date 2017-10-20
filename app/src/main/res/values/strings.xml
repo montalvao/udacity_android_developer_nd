@@ -7,4 +7,5 @@
     <string name="error_panel_nonetwork">No network!\n\nTap to retry</string>
     <string name="error_panel_sync">Sync error!\n\nTap to retry</string>
     <string name="movie_details_rating">User Rating: %s</string>
+    <string name="movie_details_release_date">Release Date: %s</string>
 </resources>
