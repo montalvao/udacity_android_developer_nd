@@ -11,6 +11,9 @@ import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.sync.TMDBHelper;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -23,6 +26,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.moviesdetails_view_rating) TextView mRatingView;
     @BindView(R.id.moviesdetails_view_synopsis) TextView mSynopsisView;
     @BindView(R.id.moviesdetails_view_poster) ImageView mPosterView;
+    @BindView(R.id.moviesdetails_view_release_date) TextView mReleaseDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         String rating = getResources().getString(R.string.movie_details_rating, mMovie.rating);
         mRatingView.setText(rating);
+
+        try {
+            DateFormat fmtDest = DateFormat.getDateInstance(DateFormat.SHORT);
+            String releaseDate = getResources().getString(R.string.movie_details_release_date,
+                    fmtDest.format(TMDBHelper.parseReleaseDate(mMovie.releaseDate)));
+
+            mReleaseDate.setText(releaseDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         Uri posterUri = TMDBHelper.getPosterUri(mMovie.posterPath);
 
