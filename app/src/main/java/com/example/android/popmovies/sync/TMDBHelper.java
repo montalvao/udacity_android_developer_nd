@@ -8,6 +8,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Class TMDBHelper: static methods to encapsulate TMDB (The Movie Database) API requirements.
@@ -30,12 +34,20 @@ public class TMDBHelper {
     /* Base for poster images URLs */
     private static final String IMAGE_URI_BASE = "http://image.tmdb.org/t/p";
 
+    /* Date format of release_date API field */
+    private static final String RELEASE_DATE_FORMAT_STRING = "yyyy-MM-dd";
+
     /* The API key (hardcoded in the project configuration file). */
     private static final String API_KEY = BuildConfig.TMDB_API_KEY;
 
     public static Uri getPosterUri(String filename) {
         /* TODO: Optimize for device screen */
         return buildPosterUri("w185", filename);
+    }
+
+    public static Date parseReleaseDate(String releaseDate) throws ParseException {
+        final SimpleDateFormat formatOrig = new SimpleDateFormat(RELEASE_DATE_FORMAT_STRING, Locale.US);
+        return formatOrig.parse(releaseDate);
     }
 
     static URL getListedByPopularityURL() {
