@@ -174,16 +174,13 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         String sortOrder = PopMoviesPreferences.getSortOrderName(this);
         Resources resources = getResources();
 
-        PopMoviesWebSync.Builder builder = new PopMoviesWebSync.Builder();
         if (sortOrder.equals(resources.getString(R.string.movies_sortby_popularity))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_POPULARITY);
+            return new PopMoviesWebSync(PopMoviesWebSync.SORT_BY_POPULARITY);
         } else if (sortOrder.equals(resources.getString(R.string.movies_sortby_rating))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_RATING);
+            return new PopMoviesWebSync(PopMoviesWebSync.SORT_BY_RATING);
         } else {
             throw new RuntimeException();
         }
-
-        return builder.build();
     }
 
     private void showSortOrderDialog() {
