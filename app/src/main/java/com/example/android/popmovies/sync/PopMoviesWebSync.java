@@ -21,7 +21,7 @@ import okhttp3.ResponseBody;
  *
  * @see <a href="https://www.themoviedb.org/" />
  */
-public class PopMoviesWebSync implements PopMoviesSync {
+public class PopMoviesWebSync implements MoviesSyncEngine {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({SORT_BY_POPULARITY, SORT_BY_RATING})
@@ -29,12 +29,11 @@ public class PopMoviesWebSync implements PopMoviesSync {
     public static final int SORT_BY_POPULARITY = 0;
     public static final int SORT_BY_RATING = 1;
 
-    private int mSortBy = SORT_BY_POPULARITY;
+    private final int mSortBy;
 
-    /**
-     * Private constructor, because instances are provided only by the inner Builder class.
-     */
-    private PopMoviesWebSync() {}
+    public PopMoviesWebSync(@SortingKey int sortBy) {
+        mSortBy = sortBy;
+    }
 
     /**
      * Method query() from Interface PopMoviesSync. Retrieves the movies data from TMDB. It uses
@@ -95,29 +94,5 @@ public class PopMoviesWebSync implements PopMoviesSync {
         TMDBHelper.APIResponseJSON result = gson.fromJson(jsonString, TMDBHelper.APIResponseJSON.class);
 
         return result.getMovieArray();
-    }
-
-    /**
-     * Class PopMoviesWebSync.Builder. Used solely to configure the engine for queries.
-     */
-    public static class Builder {
-
-        private final PopMoviesWebSync mWebSyncInstance;
-
-        public Builder() {
-            /*
-             * This is NOT a singleton:
-             * a new PopMoviesWebSync instance is created for each new Builder
-             */
-            mWebSyncInstance = new PopMoviesWebSync();
-        }
-
-        public void sortResultsBy(@SortingKey int sortBy) {
-            mWebSyncInstance.mSortBy = sortBy;
-        }
-
-        public PopMoviesWebSync build() {
-            return mWebSyncInstance;
-        }
     }
 }

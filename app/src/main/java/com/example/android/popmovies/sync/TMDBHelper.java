@@ -97,7 +97,9 @@ public class TMDBHelper {
      * It is annotated to be used by GSon to deserialize JSON data.
      */
     static class APIResponseJSON {
-        @SerializedName("results") private final Movie[] mMovieArray;
+
+        @SerializedName("results")
+        private final Movie[] mMovieArray;
 
         public APIResponseJSON(Movie[] movieArray) {
             mMovieArray = movieArray;

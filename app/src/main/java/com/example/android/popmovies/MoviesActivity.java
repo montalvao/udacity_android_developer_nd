@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,24 +22,27 @@ import android.widget.TextView;
 
 import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.data.PopMoviesPreferences;
-import com.example.android.popmovies.sync.PopMoviesSync;
+import com.example.android.popmovies.sync.MoviesSyncEngine;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
-
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MoviesActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener,
-        MoviesAdapter.MoviesAdapterOnClickListener, DialogInterface.OnClickListener {
+        MoviesAdapter.MoviesAdapterOnClickListener, DialogInterface.OnClickListener, AsyncTaskDelegate {
 
     private static final String TAG = MoviesActivity.class.getSimpleName();
 
     private static final String SAVED_STATE_DATA = MoviesActivity.class.getSimpleName() + ".STATE_DATA";
 
-    @BindView(R.id.movies_recyclerview) RecyclerView mMoviesRecyclerView;
-    @BindView(R.id.movies_view_loading_indicator) ProgressBar mLoadingIndicatorView;
-    @BindView(R.id.movies_view_error_text) TextView mErrorTextView;
+    @BindView(R.id.movies_recyclerview)
+    RecyclerView mMoviesRecyclerView;
+
+    @BindView(R.id.movies_view_loading_indicator)
+    ProgressBar mLoadingIndicatorView;
+
+    @BindView(R.id.movies_view_error_text)
+    TextView mErrorTextView;
 
     private MoviesAdapter mAdapter;
 
@@ -153,6 +155,37 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         startActivity(intent);
     }
 
+    /**
+     * Method onPreExecute() from Interface {@link AsyncTaskDelegate}.
+     */
+    @Override
+    public void onPreExecute() {
+        showLoadingView();
+    }
+
+    /**
+     * Method onPostExecute() from Interface {@link AsyncTaskDelegate}.
+     *
+     * @param movies    The movies list already synced.
+     */
+    @Override
+    public void onPostExecute(Movie[] movies) {
+        if (movies != null && movies.length > 0) {
+            mAdapter.setData(movies);
+            showMoviesView();
+        } else {
+            showSyncErrorView();
+        }
+    }
+
+    /**
+     * Method onCancelled() from Interface {@link AsyncTaskDelegate}.
+     */
+    @Override
+    public void onCancelled() {
+        showSyncErrorView();
+    }
+
     private void loadData() {
         if (!isNetworkConnected()) {
             /* In the future data may be persisted in a db to be used offline */
@@ -160,30 +193,28 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
             return;
         }
 
-        DataSyncTask syncTask = new DataSyncTask();
         /*
-         * Currently the only option available is syncing from TMDB, but the Interface PopMoviesSync
+         * Currently the only option available is syncing from TMDB, but the Interface MoviesSyncEngine
          * allows for easy experiments with other methods.
          */
-        PopMoviesSync syncEngine = buildWebSyncEngine();
+        MoviesSyncEngine syncEngine = buildWebSyncEngine();
+
+        MoviesDataSyncTask syncTask = new MoviesDataSyncTask(this);
 
         syncTask.execute(syncEngine);
     }
 
-    private PopMoviesSync buildWebSyncEngine() {
+    private MoviesSyncEngine buildWebSyncEngine() {
         String sortOrder = PopMoviesPreferences.getSortOrderName(this);
         Resources resources = getResources();
 
-        PopMoviesWebSync.Builder builder = new PopMoviesWebSync.Builder();
         if (sortOrder.equals(resources.getString(R.string.movies_sortby_popularity))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_POPULARITY);
+            return new PopMoviesWebSync(PopMoviesWebSync.SORT_BY_POPULARITY);
         } else if (sortOrder.equals(resources.getString(R.string.movies_sortby_rating))) {
-            builder.sortResultsBy(PopMoviesWebSync.SORT_BY_RATING);
+            return new PopMoviesWebSync(PopMoviesWebSync.SORT_BY_RATING);
         } else {
             throw new RuntimeException();
         }
-
-        return builder.build();
     }
 
     private void showSortOrderDialog() {
@@ -238,45 +269,5 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         NetworkInfo network = connectivityManager.getActiveNetworkInfo();
 
         return ( network != null && network.isConnected() );
-    }
-
-    private class DataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showLoadingView();
-        }
-
-        @Override
-        protected Movie[] doInBackground(PopMoviesSync... syncEngines) {
-            PopMoviesSync syncEngine = syncEngines[0];
-
-            Movie[] result = null;
-
-            try {
-                result = syncEngine.query();
-            } catch (IOException e) {
-                cancel(true);
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            showSyncErrorView();
-        }
-
-        @Override
-        protected void onPostExecute(Movie[] data) {
-            if (data != null && data.length > 0) {
-                mAdapter.setData(data);
-                showMoviesView();
-            } else {
-                showSyncErrorView();
-            }
-        }
     }
 }
