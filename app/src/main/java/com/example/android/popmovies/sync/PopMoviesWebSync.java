@@ -21,7 +21,7 @@ import okhttp3.ResponseBody;
  *
  * @see <a href="https://www.themoviedb.org/" />
  */
-public class PopMoviesWebSync implements PopMoviesSync {
+public class PopMoviesWebSync implements MoviesSyncEngine {
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({SORT_BY_POPULARITY, SORT_BY_RATING})

@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import com.example.android.popmovies.data.Movie;
 import com.example.android.popmovies.data.PopMoviesPreferences;
-import com.example.android.popmovies.sync.PopMoviesSync;
+import com.example.android.popmovies.sync.MoviesSyncEngine;
 import com.example.android.popmovies.sync.PopMoviesWebSync;
 
 import java.io.IOException;
@@ -165,12 +165,12 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
          * Currently the only option available is syncing from TMDB, but the Interface PopMoviesSync
          * allows for easy experiments with other methods.
          */
-        PopMoviesSync syncEngine = buildWebSyncEngine();
+        MoviesSyncEngine syncEngine = buildWebSyncEngine();
 
         syncTask.execute(syncEngine);
     }
 
-    private PopMoviesSync buildWebSyncEngine() {
+    private MoviesSyncEngine buildWebSyncEngine() {
         String sortOrder = PopMoviesPreferences.getSortOrderName(this);
         Resources resources = getResources();
 
@@ -240,7 +240,7 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         return ( network != null && network.isConnected() );
     }
 
-    private class DataSyncTask extends AsyncTask<PopMoviesSync, Void, Movie[]> {
+    private class DataSyncTask extends AsyncTask<MoviesSyncEngine, Void, Movie[]> {
 
         @Override
         protected void onPreExecute() {
@@ -249,8 +249,8 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
         }
 
         @Override
-        protected Movie[] doInBackground(PopMoviesSync... syncEngines) {
-            PopMoviesSync syncEngine = syncEngines[0];
+        protected Movie[] doInBackground(MoviesSyncEngine... syncEngines) {
+            MoviesSyncEngine syncEngine = syncEngines[0];
 
             Movie[] result = null;
 
