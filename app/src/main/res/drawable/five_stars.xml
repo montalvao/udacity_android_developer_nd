@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:right="106dp">
+        <bitmap android:src="@android:drawable/btn_star_big_on"
+            android:gravity="center" />
+    </item>
+    <item android:right="53dp">
+        <bitmap android:src="@android:drawable/btn_star_big_on"
+            android:gravity="center" />
+    </item>
+    <item>
+        <bitmap android:src="@android:drawable/btn_star_big_on"
+            android:gravity="center" />
+    </item>
+    <item android:left="53dp">
+        <bitmap android:src="@android:drawable/btn_star_big_on"
+            android:gravity="center" />
+    </item>
+    <item android:left="106dp">
+        <bitmap android:src="@android:drawable/btn_star_big_on"
+            android:gravity="center" />
+    </item>
+</layer-list>

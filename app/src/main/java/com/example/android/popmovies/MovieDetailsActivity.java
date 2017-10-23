@@ -12,7 +12,9 @@ import com.example.android.popmovies.sync.TMDBHelper;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,14 +29,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.moviesdetails_view_title_original)
     TextView mTitleOriginalView;
 
-    @BindView(R.id.moviesdetails_view_rating)
-    TextView mRatingView;
-
     @BindView(R.id.moviesdetails_view_synopsis)
     TextView mSynopsisView;
 
     @BindView(R.id.moviesdetails_view_poster)
     ImageView mPosterView;
+
+    @BindView(R.id.moviesdetails_view_ratingstars)
+    ImageView mRatingStarsView;
+
+    @BindView(R.id.moviesdetails_view_rating)
+    TextView mRatingView;
 
     @BindView(R.id.moviesdetails_view_release_date)
     TextView mReleaseDate;
@@ -71,9 +76,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         mTitleOriginalView.setText(mMovie.titleOriginal);
         mSynopsisView.setText(mMovie.synopsis);
         mPosterView.setContentDescription(mMovie.title);
+        mRatingView.setText(mMovie.rating);
 
-        String rating = getResources().getString(R.string.movie_details_rating, mMovie.rating);
-        mRatingView.setText(rating);
+        NumberFormat format = NumberFormat.getNumberInstance(Locale.US);
+        try {
+            int userRating = format.parse(mMovie.rating).intValue();
+            mRatingStarsView.getDrawable().setLevel(userRating * 1000);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         try {
             DateFormat fmtDest = DateFormat.getDateInstance(DateFormat.SHORT);

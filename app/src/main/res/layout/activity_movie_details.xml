@@ -43,7 +43,7 @@
         app:layout_constraintTop_toBottomOf="@+id/moviesdetails_view_title"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/moviesdetails_view_rating"
+        app:layout_constraintBottom_toTopOf="@+id/moviesdetails_view_ratingstars"
         app:layout_constraintVertical_bias="0.10" />
 
     <TextView
@@ -56,19 +56,29 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/moviesdetails_view_rating" />
+        app:layout_constraintBottom_toTopOf="@id/moviesdetails_view_ratingstars" />
+
+    <ImageView
+        android:id="@+id/moviesdetails_view_ratingstars"
+        android:src="@drawable/user_rating"
+        android:contentDescription="@string/user_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/moviesdetails_view_poster"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/moviesdetails_view_poster"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
         android:id="@+id/moviesdetails_view_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@id/moviesdetails_view_poster"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="12sp"
+        android:layout_marginStart="4dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/moviesdetails_view_poster"
-        android:layout_marginBottom="8dp"/>
+        app:layout_constraintStart_toEndOf="@id/moviesdetails_view_ratingstars"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/moviesdetails_view_ratingstars" />
 
     <ScrollView
         android:layout_width="0dp"
