@@ -14,13 +14,26 @@ public class Movie implements Parcelable {
 
     public static final String MOVIE_CONTENT = Movie.class.getSimpleName() + ".MOVIE_CONTENT";
 
-    @SerializedName("id") public final int id;
-    @SerializedName("title") public final String title;
-    @SerializedName("original_title") public final String titleOriginal;
-    @SerializedName("overview") public final String synopsis;
-    @SerializedName("vote_average") public final String rating;
-    @SerializedName("poster_path") public final String posterPath;
-    @SerializedName("release_date") public final String releaseDate;
+    @SerializedName("id")
+    public final int id;
+
+    @SerializedName("title")
+    public final String title;
+
+    @SerializedName("original_title")
+    public final String titleOriginal;
+
+    @SerializedName("overview")
+    public final String synopsis;
+
+    @SerializedName("vote_average")
+    public final String rating;
+
+    @SerializedName("poster_path")
+    public final String posterPath;
+
+    @SerializedName("release_date")
+    public final String releaseDate;
 
     Movie(Parcel in) {
         id = in.readInt();

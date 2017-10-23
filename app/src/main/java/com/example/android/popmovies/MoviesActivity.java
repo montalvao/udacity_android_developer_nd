@@ -38,9 +38,14 @@ public class MoviesActivity extends AppCompatActivity implements SharedPreferenc
 
     private static final String SAVED_STATE_DATA = MoviesActivity.class.getSimpleName() + ".STATE_DATA";
 
-    @BindView(R.id.movies_recyclerview) RecyclerView mMoviesRecyclerView;
-    @BindView(R.id.movies_view_loading_indicator) ProgressBar mLoadingIndicatorView;
-    @BindView(R.id.movies_view_error_text) TextView mErrorTextView;
+    @BindView(R.id.movies_recyclerview)
+    RecyclerView mMoviesRecyclerView;
+
+    @BindView(R.id.movies_view_loading_indicator)
+    ProgressBar mLoadingIndicatorView;
+
+    @BindView(R.id.movies_view_error_text)
+    TextView mErrorTextView;
 
     private MoviesAdapter mAdapter;
 

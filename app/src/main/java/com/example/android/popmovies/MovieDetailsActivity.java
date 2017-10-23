@@ -21,12 +21,23 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private Movie mMovie;
 
-    @BindView(R.id.moviesdetails_view_title) TextView mTitleView;
-    @BindView(R.id.moviesdetails_view_title_original) TextView mTitleOriginalView;
-    @BindView(R.id.moviesdetails_view_rating) TextView mRatingView;
-    @BindView(R.id.moviesdetails_view_synopsis) TextView mSynopsisView;
-    @BindView(R.id.moviesdetails_view_poster) ImageView mPosterView;
-    @BindView(R.id.moviesdetails_view_release_date) TextView mReleaseDate;
+    @BindView(R.id.moviesdetails_view_title)
+    TextView mTitleView;
+
+    @BindView(R.id.moviesdetails_view_title_original)
+    TextView mTitleOriginalView;
+
+    @BindView(R.id.moviesdetails_view_rating)
+    TextView mRatingView;
+
+    @BindView(R.id.moviesdetails_view_synopsis)
+    TextView mSynopsisView;
+
+    @BindView(R.id.moviesdetails_view_poster)
+    ImageView mPosterView;
+
+    @BindView(R.id.moviesdetails_view_release_date)
+    TextView mReleaseDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
